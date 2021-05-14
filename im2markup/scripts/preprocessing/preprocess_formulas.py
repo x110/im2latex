@@ -4,7 +4,7 @@ import sys, os, argparse, logging, subprocess, shutil
 
 def is_ascii(str):
     try:
-        str.decode('ascii')
+        #str.decode('ascii')
         return True
     except UnicodeError:
         return False
