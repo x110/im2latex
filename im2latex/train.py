@@ -66,6 +66,8 @@ def main():
                         default=False, help="Training from checkpoint or not")
     parser.add_argument("--train_on_single_batch", action='store_true',
                         default=False, help="Training from checkpoint or not")
+    parser.add_argument("--wandb", action='store_true',
+                        default=False, help="Log data to weights and biases")
 
 
     args = parser.parse_args()

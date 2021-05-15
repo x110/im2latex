@@ -5,7 +5,8 @@ import torch
 from torch.nn.utils import clip_grad_norm_
 
 from utils import cal_loss, cal_epsilon
-
+import wandb
+wandb.init(project="im2latex")
 
 class Trainer(object):
     def __init__(self, optimizer, model, lr_scheduler,
@@ -101,6 +102,10 @@ class Trainer(object):
             print(mes.format(
                 self.epoch, avg_loss, 2**avg_loss
             ))
+            wandb.log({"epoch":self.epoch,
+            "val avrg loss":avg_loss,
+            "perplexit":2**avg_loss
+            })
         if avg_loss < self.best_val_loss:
             self.best_val_loss = avg_loss
             self.save_model('best_ckpt')
