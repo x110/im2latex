@@ -35,12 +35,14 @@ def main():
                         default=64, help="Max step of decoding")
     parser.add_argument("--split", type=str,
                         default="validate", help="The data split to decode")
-
+    parser.add_argument("--num_workers", type=int,
+                        default=4)
     args = parser.parse_args()
 
     # 加载 模型
     checkpoint = torch.load(join(args.model_path))
     model_args = checkpoint['args']
+    num_workers = args.num_workers
 
     # 读入词典,设置其他相关参数
     vocab = load_vocab(args.data_path)
@@ -52,7 +54,8 @@ def main():
         batch_size=args.batch_size,
         collate_fn=partial(collate_fn, vocab.sign2id),
         pin_memory=True if use_cuda else False,
-        num_workers=4
+        num_workers=num_workers,
+        shuffle=False
     )
 
     model = Im2LatexModel(
@@ -74,7 +77,7 @@ def main():
             reference = latex_producer._idx2formulas(tgt4cal_loss)
             results = latex_producer(imgs)
         except RuntimeError:
-            break
+            print("Error")
 
         result_file.write('\n'.join(results))
         ref_file.write('\n'.join(reference))
