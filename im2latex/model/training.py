@@ -21,7 +21,10 @@ class Trainer(object):
 
         self.step = 0
         self.epoch = init_epoch
-        self.total_step = (init_epoch-1)*len(train_loader)
+        try:
+          self.total_step = (init_epoch-1)*len(train_loader)
+        except:
+          self.total_step = (init_epoch-1)
         self.last_epoch = last_epoch
         self.best_val_loss = 1e18
         self.device = torch.device("cuda" if use_cuda else "cpu")
@@ -90,7 +93,11 @@ class Trainer(object):
                 logits = self.model(imgs, tgt4training, epsilon)
                 loss = cal_loss(logits, tgt4cal_loss)
                 val_total_loss += loss
-            avg_loss = val_total_loss / len(self.val_loader)
+            try:
+              avg_loss = val_total_loss / len(self.val_loader)
+            except:
+              avg_loss = val_total_loss 
+
             print(mes.format(
                 self.epoch, avg_loss, 2**avg_loss
             ))

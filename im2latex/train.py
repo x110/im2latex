@@ -10,7 +10,7 @@ from model import Im2LatexModel, Trainer
 from utils import collate_fn, get_checkpoint
 from data import Im2LatexDataset
 from build_vocab import Vocab, load_vocab
-
+import itertools
 
 def main():
 
@@ -64,10 +64,14 @@ def main():
                         help="The random seed for reproducing ")
     parser.add_argument("--from_check_point", action='store_true',
                         default=False, help="Training from checkpoint or not")
+    parser.add_argument("--train_on_single_batch", action='store_true',
+                        default=False, help="Training from checkpoint or not")
+
 
     args = parser.parse_args()
     max_epoch = args.epoches
     from_check_point = args.from_check_point
+    train_on_single_batch = args.train_on_single_batch
     if from_check_point:
         checkpoint_path = get_checkpoint(args.save_dir)
         checkpoint = torch.load(checkpoint_path)
@@ -121,8 +125,14 @@ def main():
         patience=args.lr_patience,
         verbose=True,
         min_lr=args.min_lr)
-
-    if from_check_point:
+    if train_on_single_batch:
+      train_batch =itertools.islice(train_loader, 0,1)
+      val_batch = itertools.islice(val_loader, 0,1)
+      trainer = Trainer(optimizer, model, lr_scheduler,
+                          train_batch, val_batch, args,
+                          use_cuda=use_cuda,
+                          init_epoch=1, last_epoch=args.epoches)
+    elif from_check_point:
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         epoch = checkpoint['epoch']
@@ -132,6 +142,7 @@ def main():
                           train_loader, val_loader, args,
                           use_cuda=use_cuda,
                           init_epoch=epoch, last_epoch=max_epoch)
+
     else:
         trainer = Trainer(optimizer, model, lr_scheduler,
                           train_loader, val_loader, args,
