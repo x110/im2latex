@@ -11,13 +11,13 @@ def preprocess(data_dir, split):
     assert split in ["train", "validate", "test"]
 
     print("Process {} dataset...".format(split))
-    images_dir = join(data_dir, "formula_images_processed")
+    images_dir = join(data_dir, "images_processed")
 
-    formulas_file = join(data_dir, "im2latex_formulas.norm.lst")
+    formulas_file = join(data_dir, "formulas.norm.lst")
     with open(formulas_file, 'r') as f:
         formulas = [formula.strip('\n') for formula in f.readlines()]
 
-    split_file = join(data_dir, "im2latex_{}_filter.lst".format(split))
+    split_file = join(data_dir, "{}_filter.lst".format(split))
     pairs = []
     transform = transforms.ToTensor()
     with open(split_file, 'r') as f:
